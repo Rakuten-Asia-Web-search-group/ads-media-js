@@ -1,0 +1,8 @@
+## 0.0.1 (October 15, 2024)
+
+Beta Release:
+
+- Provide a beta release for publishers to use the Content Delivery JS SDK.
+- Only supports Staging environment, and not a production-ready release.
+- Ads Providers supported: `RPP-BTA`, `Google AdEx`, `Yahoo`, `RPP-SWAD`.
+- Provide some default templates to be used for each Ads Providers.
