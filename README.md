@@ -1,6 +1,6 @@
 # Content Delivery - JS SDK
 
-Content Delivery JS SDK is a javascript SDK for serving content (ads, themes) from Content Delivery.
+Content Delivery JS SDK is a javascript SDK for serving content (ads, themes) from Rakuten Content Delivery.
 
 Table of Contents
 
@@ -33,7 +33,7 @@ Latest (Beta) version: `https://websearch.r10s.jp/ads-media/sdk-static/sdk/0.0.1
 
 ## `Initialize SDK`
 
-After pasting the script, Mission SDK JS will be available and can be accessed in the `window` object, through the `ContentDeliverySDK` variable.
+After pasting the script, Content Delivery SDK JS will be available and can be accessed in the `window` object, through the `ContentDeliverySDK` variable.
 
 ```html
 <script>
