@@ -22,14 +22,14 @@ To install via script, import our JS SDK file by pasting the following `<script>
 
 Source file: `https://websearch.r10s.jp/ads-media/sdk-static/sdk/{VERSION}/content-delivery-sdk.js`<br />
 
-Latest (Beta) v0.0.1: https://websearch.r10s.jp/ads-media/sdk-static/sdk/0.0.1/content-delivery-sdk.js
+Latest version v1.1.1: https://websearch.r10s.jp/ads-media/sdk-static/sdk/1.1.1/content-delivery-sdk.js
 
 ```html
 <header>
 	// ... put this before the end of header tag
 	<script
 		type="text/javascript"
-		src="https://websearch.r10s.jp/ads-media/sdk-static/sdk/0.0.1/content-delivery-sdk.js"></script>
+		src="https://websearch.r10s.jp/ads-media/sdk-static/sdk/1.1.1/content-delivery-sdk.js"></script>
 </header>
 ```
 
