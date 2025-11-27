@@ -1,6 +1,6 @@
 # Content Delivery - JS SDK
 
-Content Delivery JS SDK is a javascript SDK for serving content (ads, themes) from Rakuten Content Delivery.
+Content Delivery JS SDK is a javascript SDK for serving content (ads, themes) from Content Delivery.
 
 Table of Contents
 
@@ -23,25 +23,26 @@ To install via script, import our JS SDK file by pasting the following `<script>
 
 Source file: `https://websearch.r10s.jp/ads-media/sdk-static/sdk/{VERSION}/content-delivery-sdk.js`<br />
 
-Latest version v1.2.0: https://websearch.r10s.jp/ads-media/sdk-static/sdk/1.2.0/content-delivery-sdk.js
+Latest (Beta) v1.3.0: https://websearch.r10s.jp/ads-media/sdk-static/sdk/1.3.0/content-delivery-sdk.js
 
 ```html
 <header>
-	// ... put this before the end of header tag
-	<script
-		type="text/javascript"
-		src="https://websearch.r10s.jp/ads-media/sdk-static/sdk/1.2.0/content-delivery-sdk.js"></script>
+  // ... put this before the end of header tag
+  <script
+    type="text/javascript"
+    src="https://websearch.r10s.jp/ads-media/sdk-static/sdk/1.3.0/content-delivery-sdk.js"
+  ></script>
 </header>
 ```
 
 ## `Initialize SDK`
 
-After pasting the script, Content Delivery SDK JS will be available and can be accessed in the `window` object, through the `ContentDeliverySDK` variable.
+After pasting the script, Content Delivery JS SDK will be available and can be accessed in the `window` object, through the `ContentDeliverySDK` variable.
 
 ```html
 <script>
-	const contentDeliverySDK = window.ContentDeliverySDK || {};
-	contentDeliverySDK.events = contentDeliverySDK.events || [];
+  const contentDeliverySDK = window.ContentDeliverySDK || {};
+  contentDeliverySDK.events = contentDeliverySDK.events || [];
 </script>
 ```
 
@@ -75,11 +76,11 @@ In the above example, we're displaying Ads using these parameters:
 
 ```json
 {
-	"adSlot": "rakuten-app-top",
-	"query": "iphone",
-	"pageNumber": 1,
-	"channel": "aw_web_newclient_20131007",
-	"client": "mobile"
+  "adSlot": "rakuten-app-top",
+  "query": "iphone",
+  "pageNumber": 1,
+  "channel": "aw_web_newclient_20131007",
+  "client": "mobile"
 }
 ```
 
@@ -95,8 +96,8 @@ Format:
 ```javascript
 contentDeliverySDK.displayAds({ ELEMENT_ID }, { ADSLOT_DATA }, { CALLBACK });
 contentDeliverySDK.displayMultipleAds([
-	[{ ELEMENT_ID }, { ADSLOT_DATA }, { CALLBACK }],
-	[{ ELEMENT_ID }, { ADSLOT_DATA }, { CALLBACK }],
+  [{ ELEMENT_ID }, { ADSLOT_DATA }, { CALLBACK }],
+  [{ ELEMENT_ID }, { ADSLOT_DATA }, { CALLBACK }],
 ]);
 ```
 
@@ -229,7 +230,7 @@ The ads will be displayed as an iframe inside the div element, and the iframe si
 
 ```html
 <div class="content-delivery-sdk-container" data-ad-slot="rakuten-app-top">
-	<iframe src="" width="320px" height="50px"></iframe>
+  <iframe src="" width="320px" height="50px"></iframe>
 </div>
 ```
 
@@ -237,21 +238,100 @@ But, you can also define the div element to have a specific width & height by sp
 
 ```html
 <div
-	class="content-delivery-sdk-container"
-	data-ad-slot="rakuten-app-top"
-	style="width: 400px; height: 200px"></div>
+  class="content-delivery-sdk-container"
+  data-ad-slot="rakuten-app-top"
+  style="width: 400px; height: 200px"
+></div>
 ```
 
 In this scenario, the ads will be displayed inside the div element but will still have their own width and height, and will be centered horizontally. And the DOM will become this:
 
 ```html
 <div
-	class="content-delivery-sdk-container"
-	data-ad-slot="rakuten-app-top"
-	style="width: 400px; height: 200px">
-	<iframe src="" width="320px" height="50px"></iframe>
+  class="content-delivery-sdk-container"
+  data-ad-slot="rakuten-app-top"
+  style="width: 400px; height: 200px"
+>
+  <iframe src="" width="320px" height="50px"></iframe>
 </div>
 ```
+
+## Improve RUNA & Google AdEx JS SDK Latency
+
+In order to deliver RUNA & Google AdEx Ads, we need to download their JS SDK:
+
+- RUNA SDK: https://s-cdn.rmp.rakuten.co.jp/js/aa.js
+- Google AdEx: https://securepubads.g.doubleclick.net/tag/js/gpt.js
+
+If you're sure that you will deliver RUNA or Google AdEx ads, to improve the latency and deliver the RUNA & Google AdEx faster, it's recommended to pass these additional HTML property tag.
+
+- `data-has-runa="true"`: To download RUNA JS SDK early.
+- `data-has-adex="true"`: To download Google AdEx JS SDK early.
+
+For example:
+
+```html
+<div
+  class="content-delivery-sdk-container"
+  data-ad-slot="rakuten-app-top"
+  data-has-runa="true"
+  data-has-adex="true"
+></div>
+```
+
+> Note: Please don't pass above property if you're not 100% sure that you'll deliver RUNA or Google AdEx, because it will download both JS SDK regardless there's an actual ads from them or not.
+
+## Full-Width Ads for RUNA & Google AdEx
+
+If you want to display RUNA or Google AdEx ads in full-width, you can pass the `data-full-width="true"` property to the div element.
+For example:
+
+```html
+<div
+  class="content-delivery-sdk-container"
+  data-ad-slot="rakuten-app-top"
+  data-has-runa="true"
+  data-has-adex="true"
+  data-full-width="true"
+></div>
+```
+
+This will display the ads in full-width, and the iframe will have a width of 100% of the parent element.
+
+## RUNA Single Request
+
+If you want to display multiple RUNA TDA / Unified Ads, but want them to be sent to RUNA as single request, you can pass the `data-runa-single-request="true"` property to the div element.
+This is useful to avoid the same / duplicate RUNA Ads being displayed in multiple ads placements.
+
+For example:
+
+```html
+  <div
+    id="111"
+    class="content-delivery-sdk-container"
+    data-ad-slot="sps-test-runasinglerequest"
+    data-has-runa="true"
+    data-runa-single-request="true"
+  ></div>
+
+  <div
+    id="222"
+    class="content-delivery-sdk-container"
+    data-ad-slot="sps-test-runasinglerequest2"
+    data-has-runa="true"
+    data-runa-single-request="true"
+  ></div>
+
+  <div
+    id="333"
+    class="content-delivery-sdk-container"
+    data-ad-slot="sps-test-runasinglerequest3"
+    data-has-runa="true"
+    data-runa-single-request="true"
+  ></div>
+```
+
+This will display combine and collect all RUNA TDA ads and send them in one single request.
 
 # Theme SDK
 
