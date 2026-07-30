@@ -10,6 +10,7 @@ Table of Contents
 - [Ads Providers Default UI Template](./UI.md)
 - [Ads Parameters](#ads-parameters)
 - [Extra Settings](#extra-settings)
+- [Direct Render Mode](#direct-render-mode)
 - [Theme SDK](#theme-sdk)
 - [CHANGELOG](./CHANGELOG)
 
@@ -23,14 +24,14 @@ To install via script, import our JS SDK file by pasting the following `<script>
 
 Source file: `https://websearch.r10s.jp/ads-media/sdk-static/sdk/{VERSION}/content-delivery-sdk.js`<br />
 
-Latest (Beta) v1.3.0: https://websearch.r10s.jp/ads-media/sdk-static/sdk/1.3.0/content-delivery-sdk.js
+Latest (Beta) v1.4.0: https://websearch.r10s.jp/ads-media/sdk-static/sdk/1.4.0/content-delivery-sdk.js
 
 ```html
 <header>
   // ... put this before the end of header tag
   <script
     type="text/javascript"
-    src="https://websearch.r10s.jp/ads-media/sdk-static/sdk/1.3.0/content-delivery-sdk.js"
+    src="https://websearch.r10s.jp/ads-media/sdk-static/sdk/1.4.0/content-delivery-sdk.js"
   ></script>
 </header>
 ```
@@ -90,6 +91,7 @@ You can trigger the ads display by calling Content Delivery API:
 
 1. `displayAds`: to display single ads
 2. `displayMultipleAds`: to display multiple ads
+3. `displayAdsDirect`: to display single ads using the direct render mode (bypasses the iframe for TDA/ADEX ads)
 
 Format:
 
@@ -99,6 +101,7 @@ contentDeliverySDK.displayMultipleAds([
   [{ ELEMENT_ID }, { ADSLOT_DATA }, { CALLBACK }],
   [{ ELEMENT_ID }, { ADSLOT_DATA }, { CALLBACK }],
 ]);
+await contentDeliverySDK.displayAdsDirect({ ELEMENT_ID }, { ADSLOT_DATA }, { CALLBACK });
 ```
 
 1. `ELEMENT_ID`: div element's id where the ads will be displayed.
@@ -332,6 +335,82 @@ For example:
 ```
 
 This will display combine and collect all RUNA TDA ads and send them in one single request.
+
+# Direct Render Mode
+
+Direct render mode allows TDA (RUNA) and Google AdEx ads to be rendered directly in the parent DOM, bypassing the iframe round-trip. This reduces latency for supported ad types while automatically falling back to the standard iframe path for all other ad types.
+
+## `displayAdsDirect`
+
+`displayAdsDirect` is an async variant of `displayAds` with the same ads-params and callback contract. It fetches the priority matrix first, renders TDA and ADEX entries directly into the DOM when possible, and transparently falls back to the standard iframe-based `displayAds` flow for all other ad types.
+
+### Format
+
+```javascript
+const cleanup = await contentDeliverySDK.displayAdsDirect(
+  ELEMENT_ID,
+  ADSLOT_DATA,
+  CALLBACK  // optional
+);
+```
+
+| Argument    | Type     | Required | Description                                                            |
+| ----------- | -------- | -------- | ---------------------------------------------------------------------- |
+| ELEMENT_ID  | String   | Yes      | `id` of the div element where the ad will be rendered.                 |
+| ADSLOT_DATA | Object   | Yes      | Ad slot parameters — same shape as `displayAds`. `adSlot` is required. |
+| CALLBACK    | Function | No       | Same callback signature as `displayAds`. See [Callback](#callback).    |
+
+**Returns**: `Promise<CleanupFunction | undefined>` — call the returned function to remove event listeners registered by the SDK.
+
+### Example
+
+```javascript
+const contentDeliverySDK = window.ContentDeliverySDK || {};
+contentDeliverySDK.events = contentDeliverySDK.events || [];
+
+contentDeliverySDK.events.push(async () => {
+  const cleanup = await contentDeliverySDK.displayAdsDirect(
+    'ad-container',
+    {
+      adSlot: 'rakuten-app-top',
+      query: 'iphone',
+      hasRuna: true,   // pre-load RUNA JS SDK in parallel with the priority matrix fetch
+      hasAdex: true,   // pre-load Google AdEx JS SDK in parallel with the priority matrix fetch
+    },
+    (callbackData) => {
+      if (callbackData.event === 'ADS_DISPLAYED') {
+        console.log('Ad displayed directly');
+      } else if (callbackData.event === 'ADS_EMPTY') {
+        console.log('No ads available');
+      }
+    }
+  );
+
+  // When the ad container is removed, call cleanup() to avoid memory leaks
+  // cleanup?.();
+});
+```
+
+### How It Works
+
+1. **Priority matrix fetch** — the SDK calls the Content Delivery priority matrix API to get the ordered list of ad providers for the given `adSlot`.
+2. **Parallel SDK pre-loading** — if `hasRuna` or `hasAdex` is set, the third-party JS SDKs are downloaded at the same time as the priority matrix fetch to reduce total latency.
+3. **Direct rendering cascade** — the SDK walks the priority matrix in order:
+   - **TDA (RUNA)**: rendered directly into the DOM via the RUNA JS SDK.
+   - **ADEX**: rendered directly into the DOM via the Google AdEx JS SDK.
+   - **All other types** (CA, Yahoo, RPP-BTA, RPP-SWAD, …): handed off to the standard `displayAds` iframe flow starting at the current priority matrix position.
+4. **Fallback** — if the priority matrix cannot be fetched or is empty, `displayAdsDirect` falls back to `displayAds` automatically.
+
+### Additional Parameters for Direct Render Mode
+
+The following `ADSLOT_DATA` parameters are especially relevant when using `displayAdsDirect`:
+
+| Parameter | Type    | Description                                                                                  |
+| --------- | ------- | -------------------------------------------------------------------------------------------- |
+| hasRuna   | Boolean | Pre-load the RUNA JS SDK in parallel with the priority matrix fetch to reduce total latency. |
+| hasAdex   | Boolean | Pre-load the Google AdEx JS SDK in parallel with the priority matrix fetch.                  |
+
+> **Note**: See [Ads Parameters](#ads-parameters) for the full list of supported parameters.
 
 # Theme SDK
 
