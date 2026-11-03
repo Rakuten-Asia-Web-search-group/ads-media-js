@@ -18,3 +18,35 @@ Release:
 Release:
 
 - Public Release of Content Delivery JS SDK to deliver `Coupon Advance` Ads.
+
+## 1.2.0 (September 17, 2025)
+
+Release:
+
+- Add `RUNA` ads provider support (RUNASDK module).
+- Add AdEx SDK module enhancements.
+- Add ResizeObserver module for responsive ad slot handling.
+- Update README documentation.
+
+## 1.3.0 (November 27, 2025)
+
+Release:
+
+- Enhancements to MainSDK, RUNASDK, and AdExSDK modules.
+- Improve ResizeObserver behaviour.
+- Increase JS SDK test coverage from 60% to 95% (#1444).
+
+## 1.3.2 (January 16, 2026)
+
+Release:
+
+- Fix AdEx SDK issues (#1508, #1510).
+
+## 1.4.0 (July 30, 2026)
+
+Release:
+
+- Add AdConfigFetcher module for ad configuration fetching.
+- Add ad slot priority support (AdSlotPriority types).
+- Major enhancements to MainSDK, RUNASDK, and AdExSDK modules.
+- Expand test coverage for MainSDK and AdConfigFetcher.
